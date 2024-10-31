@@ -1,0 +1,43 @@
+name: React CI
+
+on:
+  push:
+    braches: [main, master]
+
+jobs: 
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: check out code
+        uses: actions/checkout@v2
+
+      - name: use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: install dependencies
+        run: npm ci
+
+      - name: Print debugging information
+        run: |
+          echo "Node Version: $(node --version)"
+          echo "NPM Version: $(npm --version)"
+          echo "Working Directory: $(pwd)"
+          echo "Contents of Wroking Directory: $(1s -1)"
+          echo "Contents of node_modules: $(1s -1 node_modules)"
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      -name: check out code
+       uses: actions/checkout@v2
+       with:
+        node-version: '20'
+      
+      -name: Install dependencies
+       run: npm install
+
+      -name: Run Tests
+       run: npm test
