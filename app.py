@@ -1,7 +1,12 @@
 from flask import Flask, jsonify, request
-
+from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
+from Marshmallow import fields
+from sqlalchemy.orm import declarative_base, Mapped, mapped_column
 app = Flask(__name__)
 sums = []
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://sum_user:ttxs0KON6UbhoG9lLass6sKD5ENEo1wp@dpg-cshvt41u0jms73f798ng-a.oregon-postgres.render.com/sum'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
 
 @app.route('/sum', methods=['POST'])
 def add_sum():
