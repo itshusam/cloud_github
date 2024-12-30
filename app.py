@@ -33,6 +33,8 @@ def get_all_sums():
 @app.route('/sum/result/<int:result>', methods=['GET'])
 def get_sums_by_result(result):
     filtered_sums = Sum.query.filter_by(result=result).all()
+    if not filtered_sums:
+        return jsonify({'error': f'No sums found for result {result}'}), 404
     return jsonify([{'id': s.id, 'result': s.result} for s in filtered_sums]), 200
 
 if __name__ == '__main__':
