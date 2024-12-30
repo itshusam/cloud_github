@@ -1,4 +1,4 @@
-name: React CI
+name: Flask CI
 
 on:
   push:
@@ -12,21 +12,15 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
-      - name: Use Node.js
-        uses: actions/setup-node@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          node-version: '20'
+          python-version: 3.12
 
       - name: Install dependencies
-        run: npm ci
-
-      - name: Print debugging information
         run: |
-          echo "Node Version: $(node --version)"
-          echo "NPM Version: $(npm --version)"
-          echo "Working Directory: $(pwd)"
-          echo "Contents of Working Directory: $(ls -1)"
-          echo "Contents of node_modules: $(ls -1 node_modules)"
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
 
   test:
     runs-on: ubuntu-latest
@@ -35,23 +29,25 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
-      - name: Use Node.js
-        uses: actions/setup-node@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          node-version: '20'
+          python-version: 3.12
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
 
       - name: Run Tests
-        run: npm test
+        run: pytest
 
   deploy:
     needs: test
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Check out code
         uses: actions/checkout@v2
 
       - name: Set up Python
@@ -59,20 +55,13 @@ jobs:
         with:
           python-version: 3.12
 
-      - name: Install libpq-dev
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libpq-dev
-
-      - name: Create virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: Deploy to production
-        run: echo "Deployment step goes here. Add your deployment command or action."
+      - name: Deploy to Render
+        run: |
+          curl -X POST -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+          -d '{"serviceId": "<your-service-id>", "branch": "main"}' \
+          https://api.render.com/deploy
